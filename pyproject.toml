@@ -1,0 +1,33 @@
+[tool.poetry]
+name = "peract_bimanual"
+version = "0.0.1"
+description = "A perceiver actor framework for bimanual manipulation tasks"
+authors = [ "Markus Grotz <grotz@uw.edu>",
+"Mohit Shridhar <mshr@cs.washington.edu>"]
+packages = [{include = "agents"}, {include = "helpers"}, {include = "voxel"}]
+
+
+readme = "README.md"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Framework :: Robot Framework "
+]
+
+[tool.poetry.dependencies]
+python = ">=3.8,<4.0"
+einops = "0.3.2"
+ftfy = "^6.1.1"
+hydra-core = "1.0.5"
+matplotlib = "^3.7.1"
+pandas = "1.4.1"
+regex = "^2023.6.3"
+tensorboard = "^2.13.0"
+perceiver-pytorch = "^0.8.7"
+
+
+[tool.poetry.extras]
+docs = ["sphinx"]
+
+[build-system]
+requires = ["setuptools", "wheel", "poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

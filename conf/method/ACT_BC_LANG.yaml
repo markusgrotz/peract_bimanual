@@ -1,0 +1,51 @@
+# @package _group_
+
+name: 'ACT_BC_LANG'
+
+# Agent
+robot_name: 'bimanual'
+agent_type: 'bimanual'
+
+
+train_demo_path: "/home/markus/rlbench_data_v2_128/train/"
+
+activation: lrelu
+lr: 1e-4
+weight_decay: 0.000001
+grad_clip: 0.1
+demo_augmentation: True
+demo_augmentation_every_n: 10
+
+prev_action_horizon: 1
+next_action_horizon: 10
+
+# hyperparameters
+lr_backbone: 1e-5
+backbone: resnet18
+dilation: False
+position_embedding: sine
+kl_weight: 100
+chunk_size: ${method.next_action_horizon}
+
+# transformer
+input_dim: 16 # 7 revolute joints + 1 gripper joints
+enc_layers: 4
+dec_layers: 7
+dim_feedforward: 3200
+hidden_dim: 512
+dropout: 0.1
+nheads: 8
+num_queries: ${method.next_action_horizon}
+pre_norm: False
+
+# unused
+masks: False
+
+# legacy
+camera_names: ${rlbench.cameras}
+
+# ..todo:: also set the following
+
++rlbench.episode_length: 400
++rlbench.arm_action_mode: JointPosition
++rlbench.action_mode: JointPositionActionMode
