@@ -124,7 +124,7 @@ Initial release
 **PerAct^2**
 ```
 @misc{grotz2024peract2,
-      title={PerAct2: A Perceiver Actor Framework for Bimanual Manipulation Tasks}, 
+      title={PerAct2: Benchmarking and Learning for Robotic Bimanual Manipulation Tasks}, 
       author={Markus Grotz and Mohit Shridhar and Tamim Asfour and Dieter Fox},
       year={2024},
       eprint={2407.00278},
