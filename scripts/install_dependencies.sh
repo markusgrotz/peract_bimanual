@@ -72,6 +72,7 @@ cd ..
 cd $basedir/..
 conda run -n ${ENVIRONMENT_NAME} pip install -e .
 
+cd ${WORKSPACE_DIR}
 # pytorch3d
 conda install -n ${ENVIRONMENT_NAME} gxx_linux-64
 git clone https://github.com/facebookresearch/pytorch3d.git pytorch3d
