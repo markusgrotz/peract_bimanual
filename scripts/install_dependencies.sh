@@ -40,7 +40,8 @@ tar -xvf CoppeliaSim_Edu_V4_1_0_Ubuntu20_04.tar.xz -C $COPPELIASIM_ROOT --strip-
 rm -rf CoppeliaSim_Edu_V4_1_0_Ubuntu20_04.tar.xz
 
 CONDA_PREFIX=$(conda info --envs | grep -e "^${ENVIRONMENT_NAME}\ " | awk '{print $2}')
-cat > $CONDA_PREFIX/etc/conda/activate.d/coppelia_sim.sh <<EOF
+mkdir -p ${CONDA_PREFIX}/etc/conda/activate.d/
+cat > ${CONDA_PREFIX}/etc/conda/activate.d/coppelia_sim.sh <<EOF
 export COPPELIASIM_ROOT=$COPPELIASIM_ROOT
 export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:\$COPPELIASIM_ROOT
 export QT_QPA_PLATFORM_PLUGIN_PATH=\$COPPELIASIM_ROOT
@@ -70,3 +71,12 @@ cd ..
 # PerAct Bimanual
 cd $basedir/..
 conda run -n ${ENVIRONMENT_NAME} pip install -e .
+
+# pytorch3d
+conda install -n ${ENVIRONMENT_NAME} gxx_linux-64
+git clone https://github.com/facebookresearch/pytorch3d.git pytorch3d
+cd pytorch3d
+echo "Installing pytorch3d this might take a while"
+conda run -n ${ENVIRONMENT_NAME} pip install .
+cd ..
+
