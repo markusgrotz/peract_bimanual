@@ -246,7 +246,7 @@ def _add_keypoints_to_replay(
             prev_action=prev_action,
             cameras=cameras,
             episode_length=cfg.rlbench.episode_length,
-            robot_name=cfg.method.robot_name
+            robot_name=cfg.method.robot_name,
         )
         tokens = tokenize([description]).numpy()
         token_tensor = torch.from_numpy(tokens).to(device)
@@ -291,7 +291,7 @@ def _add_keypoints_to_replay(
         prev_action=prev_action,
         cameras=cameras,
         episode_length=cfg.rlbench.episode_length,
-        robot_name=cfg.method.robot_name
+        robot_name=cfg.method.robot_name,
     )
     obs_dict_tp1["lang_goal_emb"] = sentence_emb[0].float().detach().cpu().numpy()
     obs_dict_tp1["lang_token_embs"] = token_embs[0].float().detach().cpu().numpy()
@@ -320,7 +320,6 @@ def fill_replay(
     device="cpu",
     keypoint_method="heuristic",
 ):
-
     if clip_model is None:
         model, _ = load_clip("RN50", jit=False, device=device)
         clip_model = build_model(model.state_dict())

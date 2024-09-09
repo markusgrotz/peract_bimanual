@@ -17,7 +17,6 @@ import torch.multiprocessing as mp
 
 @hydra.main(config_name="config", config_path="conf")
 def main(cfg: DictConfig) -> None:
-
     cfg_yaml = OmegaConf.to_yaml(cfg)
     logging.info("\n" + cfg_yaml)
 
@@ -29,9 +28,9 @@ def main(cfg: DictConfig) -> None:
         else [cfg.rlbench.cameras]
     )
 
-    # sanity check if rgb is not used as camera name   
+    # sanity check if rgb is not used as camera name
     for camera_name in cfg.rlbench.cameras:
-        assert("rgb" not in camera_name)
+        assert "rgb" not in camera_name
 
     obs_config = create_obs_config(
         cfg.rlbench.cameras, cfg.rlbench.camera_resolution, cfg.method.name
@@ -66,7 +65,6 @@ def main(cfg: DictConfig) -> None:
     with open(os.path.join(seed_folder, "config.yaml"), "w") as f:
         f.write(cfg_yaml)
 
-
     # check if previous checkpoints already exceed the number of desired training iterations
     # if so, exit the script
     latest_weight = 0
@@ -80,17 +78,15 @@ def main(cfg: DictConfig) -> None:
             )
             sys.exit(0)
 
-
     with open(os.path.join(seed_folder, "training.log"), "a") as f:
-
-        f.write(f"# Starting training from weights: {latest_weight} to {cfg.framework.training_iterations}")
+        f.write(
+            f"# Starting training from weights: {latest_weight} to {cfg.framework.training_iterations}"
+        )
         f.write(f"# Training started on: {start_time.isoformat()}")
         f.write(os.linesep)
 
-
     # run train jobs with multiple seeds (sequentially)
     for seed in range(start_seed, start_seed + cfg.framework.seeds):
-        
         logging.info("Starting seed %d." % seed)
 
         world_size = cfg.ddp.num_devices
@@ -107,12 +103,13 @@ def main(cfg: DictConfig) -> None:
         )
 
     end_time = datetime.now()
-    duration = (end_time - start_time)
+    duration = end_time - start_time
     with open(os.path.join(seed_folder, "training.log"), "a") as f:
         f.write(f"# Training finished on: {end_time.isoformat()}")
         f.write(f"# Took {duration.total_seconds()}")
         f.write(os.linesep)
         f.write(os.linesep)
+
 
 if __name__ == "__main__":
     peract_config.on_init()

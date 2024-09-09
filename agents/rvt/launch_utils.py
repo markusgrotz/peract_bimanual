@@ -32,28 +32,25 @@ import rvt.mvt.config as mvt_cfg_mod
 
 
 def create_agent(cfg: DictConfig):
-
     exp_cfg = exp_cfg_mod.get_cfg_defaults()
     exp_cfg.bs = cfg.replay.batch_size
-    exp_cfg.tasks = ','.join(cfg.rlbench.tasks)
-    
+    exp_cfg.tasks = ",".join(cfg.rlbench.tasks)
+
     exp_cfg.freeze()
 
     mvt_cfg = mvt_cfg_mod.get_cfg_defaults()
     mvt_cfg.proprio_dim = cfg.method.low_dim_size
     mvt_cfg.freeze()
 
-
-    agent = RVTAgentWrapper(cfg.framework.checkpoint_name_prefix, cfg.rlbench, mvt_cfg, exp_cfg)
-
+    agent = RVTAgentWrapper(
+        cfg.framework.checkpoint_name_prefix, cfg.rlbench, mvt_cfg, exp_cfg
+    )
 
     preprocess_agent = PreprocessAgent(pose_agent=agent)
     return preprocess_agent
 
 
-
 class RVTAgentWrapper(Agent):
-
     def __init__(self, checkpoint_name_prefix, rlbench_cfg, mvt_cfg, exp_cfg):
         self._checkpoint_filename = f"{checkpoint_name_prefix}.pt"
         self.rvt_agent = None
@@ -61,10 +58,10 @@ class RVTAgentWrapper(Agent):
         self.mvt_cfg = mvt_cfg
         self.exp_cfg = exp_cfg
         self._summaries = {}
-        
-    def build(self, training: bool, device=None) -> None:
 
+    def build(self, training: bool, device=None) -> None:
         import torch
+
         torch.cuda.set_device(device)
         torch.cuda.empty_cache()
 
@@ -82,7 +79,7 @@ class RVTAgentWrapper(Agent):
 
         self.rvt_agent = rvt_agent.RVTAgent(
             network=rvt,
-            #image_resolution=self.rlbench_cfg.camera_resolution,
+            # image_resolution=self.rlbench_cfg.camera_resolution,
             add_lang=self.mvt_cfg.add_lang,
             scene_bounds=self.rlbench_cfg.scene_bounds,
             cameras=self.rlbench_cfg.cameras,
@@ -98,14 +95,12 @@ class RVTAgentWrapper(Agent):
             replay_sample[k] = v.unsqueeze(1)
         # RVT is based on the PerAct's Colab version.
         replay_sample["lang_goal_embs"] = replay_sample["lang_token_embs"]
-        replay_sample["tasks"] = self.exp_cfg.tasks.split(',')
+        replay_sample["tasks"] = self.exp_cfg.tasks.split(",")
 
         update_dict = self.rvt_agent.update(step, replay_sample)
 
-
         for key, val in self.rvt_agent.loss_log.items():
             self._summaries[key] = np.mean(np.array(val))
-
 
         return {
             "total_losses": update_dict["total_loss"],
@@ -142,16 +137,14 @@ class RVTAgentWrapper(Agent):
 
         if isinstance(model, DDP):
             model = model.module
-        
+
         model.load_state_dict(state_dict["model_state"])
         optimizer.load_state_dict(state_dict["optimizer_state"])
         lr_sched.load_state_dict(state_dict["lr_sched_state"])
-    
-        return self.rvt_agent.load_clip()
-        
-   
-    def save_weights(self, savedir: str) -> None:
 
+        return self.rvt_agent.load_clip()
+
+    def save_weights(self, savedir: str) -> None:
         os.makedirs(savedir, exist_ok=True)
 
         weight_file = os.path.join(savedir, self._checkpoint_filename)
@@ -173,4 +166,3 @@ class RVTAgentWrapper(Agent):
             },
             weight_file,
         )
-

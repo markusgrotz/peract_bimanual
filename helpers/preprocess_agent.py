@@ -14,11 +14,9 @@ from yarr.agents.agent import (
 
 
 class PreprocessAgent(Agent):
-
-    def __init__(self,
-                 pose_agent: Agent,
-                 norm_rgb: bool = True,
-                 norm_type: str = 'zero_mean'):
+    def __init__(
+        self, pose_agent: Agent, norm_rgb: bool = True, norm_type: str = "zero_mean"
+    ):
         self._pose_agent = pose_agent
         self._norm_rgb = norm_rgb
         self._norm_type = norm_type
@@ -27,22 +25,21 @@ class PreprocessAgent(Agent):
         self._pose_agent.build(training, device)
 
     def _norm_rgb_(self, x):
-        if self._norm_type == 'zero_mean':
+        if self._norm_type == "zero_mean":
             return (x.float() / 255.0) * 2.0 - 1.0
-        elif self._norm_type == 'imagenet':
+        elif self._norm_type == "imagenet":
             # normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
             #                                  std=[0.229, 0.224, 0.225])
             # return normalize(x)
-            return (x.float() / 255.0)
+            return x.float() / 255.0
         else:
             raise NotImplementedError
 
     def update(self, step: int, replay_sample: dict) -> dict:
         # Samples are (B, N, ...) where N is number of buffers/tasks. This is a single task setup, so 0 index.
         replay_sample = {
-            k: v[:, 0]
-            if len(v.shape) > 2 and v.shape[1] == 1
-            else v for k, v in replay_sample.items()
+            k: v[:, 0] if len(v.shape) > 2 and v.shape[1] == 1 else v
+            for k, v in replay_sample.items()
         }
         for k, v in replay_sample.items():
             if self._norm_rgb and "rgb" in k:
@@ -76,36 +73,44 @@ class PreprocessAgent(Agent):
         ]
 
         for robot_prefix in ["", "right_", "left_"]:
-
             if not f"{robot_prefix}low_dim_state" in self._replay_sample.keys():
                 continue
 
-            sums.extend([HistogramSummary(
-                f"{prefix}/{robot_prefix}low_dim_state", self._replay_sample[f"{robot_prefix}low_dim_state"]
-            ),
-            HistogramSummary(
-                f"{prefix}/{robot_prefix}low_dim_state_tp1",
-                self._replay_sample[f"{robot_prefix}low_dim_state_tp1"],
-            ),
-            ScalarSummary(
-                f"{prefix}/{robot_prefix}low_dim_state_mean",
-                self._replay_sample[f"{robot_prefix}low_dim_state"].mean(),
-            ),
-            ScalarSummary(
-                f"{prefix}/{robot_prefix}low_dim_state_min",
-                self._replay_sample[f"{robot_prefix}low_dim_state"].min(),
-            ),
-            ScalarSummary(
-                f"{prefix}/{robot_prefix}low_dim_state_max",
-                self._replay_sample[f"{robot_prefix}low_dim_state"].max(),
-            )])
+            sums.extend(
+                [
+                    HistogramSummary(
+                        f"{prefix}/{robot_prefix}low_dim_state",
+                        self._replay_sample[f"{robot_prefix}low_dim_state"],
+                    ),
+                    HistogramSummary(
+                        f"{prefix}/{robot_prefix}low_dim_state_tp1",
+                        self._replay_sample[f"{robot_prefix}low_dim_state_tp1"],
+                    ),
+                    ScalarSummary(
+                        f"{prefix}/{robot_prefix}low_dim_state_mean",
+                        self._replay_sample[f"{robot_prefix}low_dim_state"].mean(),
+                    ),
+                    ScalarSummary(
+                        f"{prefix}/{robot_prefix}low_dim_state_min",
+                        self._replay_sample[f"{robot_prefix}low_dim_state"].min(),
+                    ),
+                    ScalarSummary(
+                        f"{prefix}/{robot_prefix}low_dim_state_max",
+                        self._replay_sample[f"{robot_prefix}low_dim_state"].max(),
+                    ),
+                ]
+            )
 
         for k, v in self._replay_sample.items():
             if "rgb" in k or "point_cloud" in k:
                 if "rgb" in k:
                     # Convert back to 0 - 1
                     v = (v + 1.0) / 2.0
-                sums.append(ImageSummary('%s/%s' % (prefix, k), tile(v) if len(v.shape) > 4 else v))
+                sums.append(
+                    ImageSummary(
+                        "%s/%s" % (prefix, k), tile(v) if len(v.shape) > 4 else v
+                    )
+                )
 
         if "sampling_probabilities" in self._replay_sample:
             sums.extend(

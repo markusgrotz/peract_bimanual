@@ -154,7 +154,7 @@ def _add_keypoints_to_replay(
             prev_action=prev_action,
             cameras=cameras,
             episode_length=cfg.rlbench.episode_length,
-            robot_name=cfg.method.robot_name
+            robot_name=cfg.method.robot_name,
         )
         del obs_dict["ignore_collisions"]
         tokens = tokenize([description]).numpy()
@@ -181,7 +181,7 @@ def _add_keypoints_to_replay(
         prev_action=prev_action,
         cameras=cameras,
         episode_length=cfg.rlbench.episode_length,
-        robot_name=cfg.method.robot_name
+        robot_name=cfg.method.robot_name,
     )
     obs_dict_tp1["lang_goal_emb"] = lang_feats[0].float().detach().cpu().numpy()
     # del obs_dict_tp1['lang_goal_tokens']
@@ -205,7 +205,6 @@ def fill_replay(
     clip_model=None,
     device="cpu",
 ):
-
     if clip_model is None:
         model, _ = load_clip("RN50", jit=False, device=device)
         clip_model = build_model(model.state_dict())

@@ -21,6 +21,7 @@ from pyrep.objects import VisionSensor, Dummy
 
 import logging
 
+
 class CustomRLBenchEnv(RLBenchEnv):
     def __init__(
         self,
@@ -131,14 +132,16 @@ class CustomRLBenchEnv(RLBenchEnv):
         obs.left.joint_positions = left_joint_pos
         obs.left.gripper_pose = left_grip_pose
 
-        obs_dict['left_joint_positions'] = obs.left.joint_positions
-        obs_dict['left_gripper_joint_positions'] = obs.left.gripper_joint_positions
-        obs_dict['right_joint_positions'] = obs.right.joint_positions
-        obs_dict['right_gripper_joint_positions'] = obs.right.gripper_joint_positions
+        obs_dict["left_joint_positions"] = obs.left.joint_positions
+        obs_dict["left_gripper_joint_positions"] = obs.left.gripper_joint_positions
+        obs_dict["right_joint_positions"] = obs.right.joint_positions
+        obs_dict["right_gripper_joint_positions"] = obs.right.gripper_joint_positions
 
         return obs_dict
 
-    def extract_obs_unimanual(self, obs: UnimanualObservation, t=None, prev_action=None):
+    def extract_obs_unimanual(
+        self, obs: UnimanualObservation, t=None, prev_action=None
+    ):
         obs.joint_velocities = None
         grip_mat = obs.gripper_matrix
         grip_pose = obs.gripper_pose
@@ -168,8 +171,8 @@ class CustomRLBenchEnv(RLBenchEnv):
         obs.gripper_pose = grip_pose
         # obs_dict['gripper_pose'] = grip_pose
 
-        obs_dict['joint_positions'] = obs.joint_positions
-        obs_dict['gripper_joint_positions'] = obs.gripper_joint_positions
+        obs_dict["joint_positions"] = obs.joint_positions
+        obs_dict["gripper_joint_positions"] = obs.gripper_joint_positions
 
         return obs_dict
 
@@ -397,10 +400,10 @@ class CustomMultiTaskRLBenchEnv(MultiTaskRLBenchEnv):
         obs.left.joint_positions = left_joint_pos
         obs.left.gripper_pose = left_grip_pose
 
-        obs_dict['left_joint_positions'] = obs.left.joint_positions
-        obs_dict['left_gripper_joint_positions'] = obs.left.gripper_joint_positions
-        obs_dict['right_joint_positions'] = obs.right.joint_positions
-        obs_dict['right_gripper_joint_positions'] = obs.right.gripper_joint_positions
+        obs_dict["left_joint_positions"] = obs.left.joint_positions
+        obs_dict["left_gripper_joint_positions"] = obs.left.gripper_joint_positions
+        obs_dict["right_joint_positions"] = obs.right.joint_positions
+        obs_dict["right_gripper_joint_positions"] = obs.right.gripper_joint_positions
 
         return obs_dict
 
@@ -435,8 +438,8 @@ class CustomMultiTaskRLBenchEnv(MultiTaskRLBenchEnv):
         obs.gripper_pose = grip_pose
         # obs_dict['gripper_pose'] = grip_pose
 
-        obs_dict['joint_positions'] = obs.joint_positions
-        obs_dict['gripper_joint_positions'] = obs.gripper_joint_positions
+        obs_dict["joint_positions"] = obs.joint_positions
+        obs_dict["gripper_joint_positions"] = obs.gripper_joint_positions
 
         return obs_dict
 

@@ -197,10 +197,10 @@ def main(eval_cfg: DictConfig) -> None:
         raise Exception(f"Missing seed{start_seed}/config.yaml. Logdir is {logdir}")
 
     # sanity checks
-    assert(train_cfg.method.name == eval_cfg.method.name)
-    assert(train_cfg.method.agent_type == eval_cfg.method.agent_type)
+    assert train_cfg.method.name == eval_cfg.method.name
+    assert train_cfg.method.agent_type == eval_cfg.method.agent_type
     for task in eval_cfg.rlbench.tasks:
-        assert(task in train_cfg.rlbench.tasks)
+        assert task in train_cfg.rlbench.tasks
 
     env_device = utils.get_device(eval_cfg.framework.gpu)
     logging.info("Using env device %s." % str(env_device))
@@ -209,7 +209,6 @@ def main(eval_cfg: DictConfig) -> None:
     arm_action_mode = eval(eval_cfg.rlbench.arm_action_mode)()
     action_mode = eval(eval_cfg.rlbench.action_mode)(arm_action_mode, gripper_mode)
 
-    
     is_bimanual = eval_cfg.method.robot_name == "bimanual"
 
     if is_bimanual:
@@ -232,7 +231,7 @@ def main(eval_cfg: DictConfig) -> None:
         eval_cfg.rlbench.cameras,
         eval_cfg.rlbench.camera_resolution,
         eval_cfg.method.name,
-        eval_cfg.method.robot_name
+        eval_cfg.method.robot_name,
     )
 
     if eval_cfg.cinematic_recorder.enabled:
@@ -244,9 +243,8 @@ def main(eval_cfg: DictConfig) -> None:
     task_classes = []
     for task in tasks:
         if task not in task_files:
-            raise ValueError('Task %s not recognised!.' % task)
+            raise ValueError("Task %s not recognised!." % task)
         task_classes.append(task_file_to_task_class(task, is_bimanual))
-
 
     # single-task or multi-task
     if multi_task:

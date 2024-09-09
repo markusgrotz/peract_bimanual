@@ -572,9 +572,18 @@ class QAttentionPerActBCAgent(Agent):
             left_q_trans, left_q_rot_grip, left_q_collision
         )
 
-
-        right_q_trans_loss, right_q_rot_loss, right_q_grip_loss, right_q_collision_loss = 0.0, 0.0, 0.0, 0.0
-        left_q_trans_loss, left_q_rot_loss, left_q_grip_loss, left_q_collision_loss = 0.0, 0.0, 0.0, 0.0
+        (
+            right_q_trans_loss,
+            right_q_rot_loss,
+            right_q_grip_loss,
+            right_q_collision_loss,
+        ) = (0.0, 0.0, 0.0, 0.0)
+        left_q_trans_loss, left_q_rot_loss, left_q_grip_loss, left_q_collision_loss = (
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+        )
 
         # translation one-hot
         right_action_trans_one_hot = self._action_trans_one_hot_zeros.clone().detach()
@@ -672,18 +681,31 @@ class QAttentionPerActBCAgent(Agent):
             left_q_grip_flat = left_q_rot_grip[:, 3 * self._num_rotation_classes :]
             left_q_ignore_collisions_flat = left_q_collision
 
-
             # rotation loss
-            right_q_rot_loss += self._celoss(right_q_rot_x_flat, right_action_rot_x_one_hot)
-            right_q_rot_loss += self._celoss(right_q_rot_y_flat, right_action_rot_y_one_hot)
-            right_q_rot_loss += self._celoss(right_q_rot_z_flat, right_action_rot_z_one_hot)
+            right_q_rot_loss += self._celoss(
+                right_q_rot_x_flat, right_action_rot_x_one_hot
+            )
+            right_q_rot_loss += self._celoss(
+                right_q_rot_y_flat, right_action_rot_y_one_hot
+            )
+            right_q_rot_loss += self._celoss(
+                right_q_rot_z_flat, right_action_rot_z_one_hot
+            )
 
-            left_q_rot_loss += self._celoss(left_q_rot_x_flat, left_action_rot_x_one_hot)
-            left_q_rot_loss += self._celoss(left_q_rot_y_flat, left_action_rot_y_one_hot)
-            left_q_rot_loss += self._celoss(left_q_rot_z_flat, left_action_rot_z_one_hot)
+            left_q_rot_loss += self._celoss(
+                left_q_rot_x_flat, left_action_rot_x_one_hot
+            )
+            left_q_rot_loss += self._celoss(
+                left_q_rot_y_flat, left_action_rot_y_one_hot
+            )
+            left_q_rot_loss += self._celoss(
+                left_q_rot_z_flat, left_action_rot_z_one_hot
+            )
 
             # gripper loss
-            right_q_grip_loss += self._celoss(right_q_grip_flat, right_action_grip_one_hot)
+            right_q_grip_loss += self._celoss(
+                right_q_grip_flat, right_action_grip_one_hot
+            )
             left_q_grip_loss += self._celoss(left_q_grip_flat, left_action_grip_one_hot)
 
             # collision loss
@@ -694,12 +716,11 @@ class QAttentionPerActBCAgent(Agent):
                 left_q_ignore_collisions_flat, left_action_ignore_collisions_one_hot
             )
 
-
         q_trans_loss = right_q_trans_loss + left_q_trans_loss
         q_rot_loss = right_q_rot_loss + left_q_rot_loss
         q_grip_loss = right_q_grip_loss + left_q_grip_loss
         q_collision_loss = right_q_collision_loss + left_q_collision_loss
-        
+
         combined_losses = (
             (q_trans_loss * self._trans_loss_weight)
             + (q_rot_loss * self._rot_loss_weight)
@@ -717,17 +738,18 @@ class QAttentionPerActBCAgent(Agent):
             "losses/trans_loss": q_trans_loss.mean(),
             "losses/rot_loss": q_rot_loss.mean() if with_rot_and_grip else 0.0,
             "losses/grip_loss": q_grip_loss.mean() if with_rot_and_grip else 0.0,
-
             "losses/right/trans_loss": q_trans_loss.mean(),
             "losses/right/rot_loss": q_rot_loss.mean() if with_rot_and_grip else 0.0,
             "losses/right/grip_loss": q_grip_loss.mean() if with_rot_and_grip else 0.0,
-            "losses/right/collision_loss": q_collision_loss.mean() if with_rot_and_grip else 0.0,
-
+            "losses/right/collision_loss": q_collision_loss.mean()
+            if with_rot_and_grip
+            else 0.0,
             "losses/left/trans_loss": q_trans_loss.mean(),
             "losses/left/rot_loss": q_rot_loss.mean() if with_rot_and_grip else 0.0,
             "losses/left/grip_loss": q_grip_loss.mean() if with_rot_and_grip else 0.0,
-            "losses/left/collision_loss": q_collision_loss.mean() if with_rot_and_grip else 0.0,
-
+            "losses/left/collision_loss": q_collision_loss.mean()
+            if with_rot_and_grip
+            else 0.0,
             "losses/collision_loss": q_collision_loss.mean()
             if with_rot_and_grip
             else 0.0,

@@ -1,4 +1,3 @@
-
 import logging
 from typing import List
 
@@ -30,9 +29,8 @@ LOW_DIM_SIZE = 4
 
 
 def create_replay(cfg, replay_path):
-    
     if cfg.method.robot_name == "bimanual":
-        return create_bimanual_replay(            
+        return create_bimanual_replay(
             cfg.replay.batch_size,
             cfg.replay.timesteps,
             cfg.replay.prioritisation,
@@ -43,7 +41,7 @@ def create_replay(cfg, replay_path):
             cfg.rlbench.camera_resolution,
         )
     else:
-        return create_unimanual_replay(            
+        return create_unimanual_replay(
             cfg.replay.batch_size,
             cfg.replay.timesteps,
             cfg.replay.prioritisation,
@@ -53,7 +51,6 @@ def create_replay(cfg, replay_path):
             cfg.method.voxel_sizes,
             cfg.rlbench.camera_resolution,
         )
-
 
 
 def create_bimanual_replay(
@@ -99,7 +96,9 @@ def create_bimanual_replay(
             )
         )
         observation_elements.append(
-            ObservationElement("%s_point_cloud" % cname, (3, image_size[1], image_size[0]), np.float16)
+            ObservationElement(
+                "%s_point_cloud" % cname, (3, image_size[1], image_size[0]), np.float16
+            )
         )  # see pyrep/objects/vision_sensor.py on how pointclouds are extracted from depth frames
         observation_elements.append(
             ObservationElement(
@@ -183,8 +182,6 @@ def create_bimanual_replay(
         extra_replay_elements=extra_replay_elements,
     )
     return replay_buffer
-
-
 
 
 def create_unimanual_replay(
@@ -293,7 +290,6 @@ def create_unimanual_replay(
     return replay_buffer
 
 
-
 def _get_action(
     obs_tp1: Observation,
     obs_tm1: Observation,
@@ -351,12 +347,10 @@ def _add_keypoints_to_replay(
     inital_obs: Observation,
     demo: Demo,
     episode_keypoints: List[int],
-
     description: str = "",
     clip_model=None,
     device="cpu",
 ):
-
     cameras = cfg.rlbench.cameras
     rlbench_scene_bounds = cfg.rlbench.scene_bounds
     voxel_sizes = cfg.method.voxel_sizes
@@ -367,13 +361,13 @@ def _add_keypoints_to_replay(
 
     prev_action = None
     obs = inital_obs
-    
+
     for k, keypoint in enumerate(episode_keypoints):
         obs_tp1 = demo[keypoint]
         obs_tm1 = demo[max(0, keypoint - 1)]
 
         if obs_tp1.is_bimanual and robot_name == "bimanual":
-            #assert isinstance(obs_tp1, BimanualObservation)
+            # assert isinstance(obs_tp1, BimanualObservation)
             (
                 right_trans_indicies,
                 right_rot_grip_indicies,
@@ -410,7 +404,7 @@ def _add_keypoints_to_replay(
 
             right_ignore_collisions = np.array([right_ignore_collisions])
             left_ignore_collisions = np.array([left_ignore_collisions])
-            
+
         elif robot_name == "unimanual":
             (
                 trans_indicies,
@@ -475,7 +469,7 @@ def _add_keypoints_to_replay(
             prev_action=prev_action,
             cameras=cameras,
             episode_length=cfg.rlbench.episode_length,
-            robot_name=robot_name
+            robot_name=robot_name,
         )
         tokens = tokenize([description]).numpy()
         token_tensor = torch.from_numpy(tokens).to(device)
@@ -487,7 +481,6 @@ def _add_keypoints_to_replay(
 
         others = {"demo": True}
         if robot_name == "bimanual":
-
             final_obs = {
                 "right_trans_action_indicies": right_trans_indicies,
                 "right_rot_grip_action_indicies": right_rot_grip_indicies,
@@ -521,7 +514,7 @@ def _add_keypoints_to_replay(
         prev_action=prev_action,
         cameras=cameras,
         episode_length=cfg.rlbench.episode_length,
-        robot_name=cfg.method.robot_name
+        robot_name=cfg.method.robot_name,
     )
     obs_dict_tp1["lang_goal_emb"] = sentence_emb[0].float().detach().cpu().numpy()
     obs_dict_tp1["lang_token_embs"] = token_embs[0].float().detach().cpu().numpy()
@@ -540,12 +533,10 @@ def fill_replay(
     clip_model=None,
     device="cpu",
 ):
-
-    num_demos=cfg.rlbench.demos
-    demo_augmentation=cfg.method.demo_augmentation
-    demo_augmentation_every_n=cfg.method.demo_augmentation_every_n
-    keypoint_method=cfg.method.keypoint_method
-
+    num_demos = cfg.rlbench.demos
+    demo_augmentation = cfg.method.demo_augmentation
+    demo_augmentation_every_n = cfg.method.demo_augmentation_every_n
+    keypoint_method = cfg.method.keypoint_method
 
     if clip_model is None:
         model, _ = load_clip("RN50", jit=False, device=device)
@@ -614,7 +605,6 @@ def fill_multi_task_replay(
     tasks: List[str],
     clip_model=None,
 ):
-
     tasks = cfg.rlbench.tasks
 
     manager = Manager()
@@ -643,15 +633,7 @@ def fill_multi_task_replay(
             )
             p = Process(
                 target=fill_replay,
-                args=(
-                    cfg,
-                    obs_config,
-                    rank,
-                    replay,
-                    task,
-                    clip_model,
-                    model_device
-                ),
+                args=(cfg, obs_config, rank, replay, task, clip_model, model_device),
             )
 
             p.start()

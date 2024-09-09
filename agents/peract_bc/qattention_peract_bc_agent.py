@@ -159,7 +159,7 @@ class QAttentionPerActBCAgent(Agent):
         transform_augmentation_rot_resolution: int = 5,
         optimizer_type: str = "adam",
         num_devices: int = 1,
-        checkpoint_name_prefix = None,
+        checkpoint_name_prefix=None,
     ):
         self._layer = layer
         self._coordinate_bounds = coordinate_bounds
@@ -788,11 +788,19 @@ class QAttentionPerActBCAgent(Agent):
         if not self._training:
             # reshape voxelizer weights
             b = merged_state_dict["_voxelizer._ones_max_coords"].shape[0]
-            merged_state_dict["_voxelizer._ones_max_coords"] = merged_state_dict["_voxelizer._ones_max_coords"][0:1]
+            merged_state_dict["_voxelizer._ones_max_coords"] = merged_state_dict[
+                "_voxelizer._ones_max_coords"
+            ][0:1]
             flat_shape = merged_state_dict["_voxelizer._flat_output"].shape[0]
-            merged_state_dict["_voxelizer._flat_output"] = merged_state_dict["_voxelizer._flat_output"][0:flat_shape // b]
-            merged_state_dict["_voxelizer._tiled_batch_indices"] = merged_state_dict["_voxelizer._tiled_batch_indices"][0:1]
-            merged_state_dict["_voxelizer._index_grid"] = merged_state_dict["_voxelizer._index_grid"][0:1]
+            merged_state_dict["_voxelizer._flat_output"] = merged_state_dict[
+                "_voxelizer._flat_output"
+            ][0 : flat_shape // b]
+            merged_state_dict["_voxelizer._tiled_batch_indices"] = merged_state_dict[
+                "_voxelizer._tiled_batch_indices"
+            ][0:1]
+            merged_state_dict["_voxelizer._index_grid"] = merged_state_dict[
+                "_voxelizer._index_grid"
+            ][0:1]
         self._q.load_state_dict(merged_state_dict)
         print("loaded weights from %s" % weight_file)
 

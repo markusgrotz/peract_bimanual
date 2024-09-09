@@ -1,5 +1,7 @@
 # Perceiver-Actor^2: A Multi-Task Transformer for Bimanual Robotic Manipulation Tasks
 
+[![Code style](https://img.shields.io/badge/code%20style-black-black)](https://black.readthedocs.io/en/stable/)
+
 This work extends previous work [PerAct](https://peract.github.io) as well as
 [RLBench](https://sites.google.com/view/rlbench) for bimanual manipulation
 tasks.

@@ -26,7 +26,7 @@ def extract_obs(
     prev_action=None,
     channels_last: bool = False,
     episode_length: int = 10,
-    robot_name: str = ""
+    robot_name: str = "",
 ):
     if obs.is_bimanual:
         return extract_obs_bimanual(
@@ -72,7 +72,8 @@ def extract_obs_unimanual(
     else:
         # add extra dim to depth data
         obs_dict = {
-            k: v if v.ndim == 3 else np.expand_dims(v, -1) for k, v in obs.perception_data.items()
+            k: v if v.ndim == 3 else np.expand_dims(v, -1)
+            for k, v in obs.perception_data.items()
         }
     obs_dict["low_dim_state"] = np.array(robot_state, dtype=np.float32)
 
@@ -106,7 +107,7 @@ def extract_obs_bimanual(
     obs: Observation,
     cameras,
     t: int = 0,
-    prev_action = None,
+    prev_action=None,
     channels_last: bool = False,
     episode_length: int = 10,
     robot_name: str = "",
@@ -135,7 +136,6 @@ def extract_obs_bimanual(
             obs.left.gripper_joint_positions, 0.0, 0.04
         )
 
-
     # fixme::
     obs_dict = vars(obs)
     obs_dict = {k: v for k, v in obs_dict.items() if v is not None}
@@ -156,7 +156,8 @@ def extract_obs_bimanual(
     else:
         # add extra dim to depth data
         obs_dict = {
-            k: v if v.ndim == 3 else np.expand_dims(v, -1) for k, v in obs.perception_data.items()
+            k: v if v.ndim == 3 else np.expand_dims(v, -1)
+            for k, v in obs.perception_data.items()
         }
 
     if robot_name == "right":
@@ -221,7 +222,7 @@ def create_obs_config(
     camera_names: List[str],
     camera_resolution: List[int],
     method_name: str,
-    robot_name: str = "bimanual"
+    robot_name: str = "bimanual",
 ):
     unused_cams = CameraConfig()
     unused_cams.set_all(False)
@@ -248,6 +249,6 @@ def create_obs_config(
         gripper_open=True,
         gripper_matrix=True,
         gripper_joint_positions=True,
-        robot_name=robot_name
+        robot_name=robot_name,
     )
     return obs_config

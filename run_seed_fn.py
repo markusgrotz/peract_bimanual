@@ -22,6 +22,7 @@ from agents import replay_utils
 import peract_config
 from functools import partial
 
+
 def run_seed(
     rank,
     cfg: DictConfig,
@@ -29,16 +30,14 @@ def run_seed(
     seed,
     world_size,
 ) -> None:
-    
-
     peract_config.config_logging()
-    
+
     dist.init_process_group("gloo", rank=rank, world_size=world_size)
 
     tasks = cfg.rlbench.tasks
     cams = cfg.rlbench.cameras
 
-    task_folder = "multi" if len(tasks) > 1 else tasks[0] 
+    task_folder = "multi" if len(tasks) > 1 else tasks[0]
     replay_path = os.path.join(
         cfg.replay.path, task_folder, cfg.method.name, "seed%d" % seed
     )
@@ -76,7 +75,6 @@ def run_seed(
             cfg.method.demo_augmentation_every_n,
             cams,
         )
-
 
     elif cfg.method.name == "VIT_BC_LANG":
         from agents.baselines import vit_bc_lang
@@ -118,7 +116,7 @@ def run_seed(
             cfg.rlbench.camera_resolution,
             replay_size=3e5,
             prev_action_horizon=cfg.method.prev_action_horizon,
-            next_action_horizon=cfg.method.next_action_horizon
+            next_action_horizon=cfg.method.next_action_horizon,
         )
 
         act_bc_lang.launch_utils.fill_multi_task_replay(
@@ -165,18 +163,14 @@ def run_seed(
             keypoint_method=cfg.method.keypoint_method,
         )
 
-
-    elif cfg.method.name.startswith("BIMANUAL_PERACT") or cfg.method.name.startswith("RVT") or cfg.method.name.startswith("PERACT_BC"):
-
+    elif (
+        cfg.method.name.startswith("BIMANUAL_PERACT")
+        or cfg.method.name.startswith("RVT")
+        or cfg.method.name.startswith("PERACT_BC")
+    ):
         replay_buffer = replay_utils.create_replay(cfg, replay_path)
-        
-        replay_utils.fill_multi_task_replay(
-            cfg,
-            obs_config,
-            rank,
-            replay_buffer,
-            tasks
-        )
+
+        replay_utils.fill_multi_task_replay(cfg, obs_config, rank, replay_buffer, tasks)
 
     elif cfg.method.name == "PERACT_RL":
         raise NotImplementedError("PERACT_RL is not supported yet")
@@ -212,8 +206,10 @@ def run_seed(
         world_size=world_size,
     )
 
-    train_runner._on_thread_start = partial(peract_config.config_logging, cfg.framework.logging_level)
-    
+    train_runner._on_thread_start = partial(
+        peract_config.config_logging, cfg.framework.logging_level
+    )
+
     train_runner.start()
 
     del train_runner
