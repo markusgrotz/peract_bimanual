@@ -13,6 +13,9 @@ For the latest updates, see: [bimanual.github.io](https://bimanual.github.io)
 
 ## Installation
 
+
+Please see [Installation](INSTALLATION.md) for further details.
+
 ### Prerequisites
 
 The code PerAct^2 is built-off the [PerAct](https://peract.github.io) which itself is
@@ -51,8 +54,9 @@ conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvi
 
 #### 2. Dependencies
 
-You need to setup RBench, PyRep, and YARR. 
-You  can use `scripts/install_dependencies.sh` to do so
+You need to setup  [RLBench](https://github.com/markusgrotz/rlbench/), [Pyrep](https://github.com/markusgrotz/Pyrep/), and [YARR](https://github.com/markusgrotz/YARR/).
+Please note that due to the bimanual functionallity the main repository does not work.
+You can use `scripts/install_dependencies.sh` to do so.
 See [Installation](INSTALLATION.md) for details.
 
 ```bash
@@ -70,6 +74,99 @@ datasets, you don't need to run `tools/bimanual_data_generator.py` from
 RLBench. Using these datasets will also help reproducibility since each scene
 is randomly sampled in `data_generator_bimanual.py`.
 
+### Training
+
+
+#### Single-GPU Training
+
+To configure and train the model, follow these guidelines:
+
+- **General Parameters**: You can find and modify general parameters in the `conf/config.yaml` file. This file contains overall settings for the training environment, such as the number of cameras or the the tasks to use.
+
+- **Method-Specific Parameters**: For parameters specific to each method, refer to the corresponding files located in the `conf/method` directory. These files define configurations tailored to each method's requirements.
+
+
+
+When training adjust the `replay.batch_size` parameter to maximize the utilization of your GPU resources. Increasing this value can improve training efficiency based on the capacity of your available hardware.
+You can either modify the config files directly or you can pass parameters directly through the command line when running the training script. This allows for quick adjustments without editing configuration files:
+
+```bash
+python train.py replay.batch_size=3 method=BIMANUAL_PERACT
+```
+
+In this example, the command sets replay.batch_size to 3 and specifies the use of the BIMANUAL_PERACT method for training.
+Another important parameter to specify the tasks is `rlbench.task_name`, which sets the overall task, and `rlbench.tasks`, which is a list of tasks used for training. Note that these can be different for evaluation.
+A complete set of tasks is shown below:
+
+```yaml
+
+rlbench:
+  task_name: multi
+  tasks:
+  - coordinated_push_box
+  - coordinated_lift_ball
+  - dual_push_buttons
+  - bimanual_pick_plate
+  - coordinated_put_item_in_drawer
+  - coordinated_put_bottle_in_fridge
+  - handover_item
+  - bimanual_pick_laptop
+  - bimanual_straighten_rope
+  - bimanual_sweep_to_dustpan
+  - coordinated_lift_tray
+  - handover_item_easy
+  - coordinated_take_tray_out_of_oven
+```
+
+
+#### Multi-GPU and Multi-Node Training
+
+This repository supports multi-GPU training and distributed training across multiple nodes using [PyTorch Distributed Data Parallel (DDP)](https://pytorch.org/docs/stable/notes/ddp.html). 
+Follow the instructions below to configure and run training across multiple GPUs and nodes.
+
+1. Multi-GPU Training on a Single Node
+
+To train using multiple GPUs on a single node, set the parameter `ddp.num_devices` to the number of GPUs available. For example, if you have 4 GPUs, you can start the training process as follows:
+
+```bash
+python train.py replay.batch_size=3 method=BIMANUAL_PERACT ddp.num_devices=4
+```
+
+This command will utilize 4 GPUs on the current node for training. Remember to set the `replay.batch_size`, which is per GPU.
+
+2. Multi-Node Training Across Different Nodes
+
+If you want to perform distributed training across multiple nodes, you need to set additional parameters: ddp.master_addr and ddp.master_port. These parameters should be configured as follows:
+
+`ddp.master_addr`: The IP address of the master node (usually the node where the training is initiated).
+`ddp.master_port`: A port number to be used for communication across nodes.
+
+Example Command:
+
+```bash
+python train.py replay.batch_size=3 method=BIMANUAL_PERACT ddp.num_devices=4 ddp.master_addr=192.168.1.1 ddp.master_port=29500
+```
+
+Note: Ensure that all nodes can communicate with each other through the specified IP and port, and that they have the same codebase, data access, and configurations for a successful distributed training run.
+
+
+
+### Evaluation
+
+
+Similar to training you can find general parameters in  `conf/eval.yaml` and method specific parameters in the `conf/method` directory.
+For each method, you have to set the execution mode in RLBench. For bimanual agents such as `BIMANUAL_PERACT` or `PERACT_BC` this is:
+
+```yaml
+rlbench:
+  gripper_mode: 'BimanualDiscrete'
+  arm_action_mode: 'BimanualEndEffectorPoseViaPlanning'
+  action_mode: 'BimanualMoveArmThenGripper'
+```
+
+
+To generate videos of the current evaluation you can set `cinematic_recorder.enabled` to `True`.
+It is recommended during evalution to disable the recorder, i.e. `cinematic_recorder.enabled=False`, as rendering the video increases the total evaluation time.
 
 
 ## Acknowledgements
@@ -114,6 +211,13 @@ Thanks for open-sourcing!
 - [CLIP License (MIT)](https://github.com/openai/CLIP/blob/main/LICENSE)
 
 ## Release Notes
+
+
+**Update 2024-10-17**
+
+- Update Readme
+
+
 
 **Update 2024-07-10**
 
