@@ -56,7 +56,9 @@ cd yarr
 conda run -n ${ENVIRONMENT_NAME} pip install -e .
 cd ..
 
-# Pyep
+# Pyrep
+
+mamba install cffi==1.14.2  
 git clone https://github.com/markusgrotz/PyRep.git pyrep
 cd pyrep
 conda run -n ${ENVIRONMENT_NAME} pip install -e .
