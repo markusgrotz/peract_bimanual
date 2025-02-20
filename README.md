@@ -212,6 +212,16 @@ Thanks for open-sourcing!
 
 ## Release Notes
 
+**Update 2025-02-20**
+
+- Update instructions
+- Add missing dependency for install script
+- Add docker build file
+
+**Update 2024-11-06**
+
+- Regenerat and repack dataset. Closes #13. Task names are now more consistent. Dataset now includes waypoint information.
+
 
 **Update 2024-10-17**
 
@@ -221,7 +231,7 @@ Thanks for open-sourcing!
 
 **Update 2024-07-10**
 
-Initial release
+- Initial release
 
 
 ## Citations 
