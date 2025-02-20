@@ -48,6 +48,17 @@ export QT_QPA_PLATFORM_PLUGIN_PATH=\$COPPELIASIM_ROOT
 EOF
 
 
+
+cd ${WORKSPACE_DIR}
+# pytorch3d
+conda install -n ${ENVIRONMENT_NAME} gxx_linux-64
+git clone --depth 1 https://github.com/facebookresearch/pytorch3d.git pytorch3d 
+cd pytorch3d
+sed -i "s/c++14/c++17/" setup.py 
+echo "Installing pytorch3d this might take a while"
+conda run -n ${ENVIRONMENT_NAME} pip install .
+cd ..
+
 cd ${WORKSPACE_DIR}
 
 # YARR
@@ -73,13 +84,4 @@ cd ..
 # PerAct Bimanual
 cd $basedir/..
 conda run -n ${ENVIRONMENT_NAME} pip install -e .
-
-cd ${WORKSPACE_DIR}
-# pytorch3d
-conda install -n ${ENVIRONMENT_NAME} gxx_linux-64
-git clone https://github.com/facebookresearch/pytorch3d.git pytorch3d
-cd pytorch3d
-echo "Installing pytorch3d this might take a while"
-conda run -n ${ENVIRONMENT_NAME} pip install .
-cd ..
 
