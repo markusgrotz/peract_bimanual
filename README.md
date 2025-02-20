@@ -103,19 +103,19 @@ A complete set of tasks is shown below:
 rlbench:
   task_name: multi
   tasks:
-  - coordinated_push_box
-  - coordinated_lift_ball
-  - dual_push_buttons
+  - bimanual_push_box
+  - bimanual_lift_ball
+  - bimanual_dual_push_buttons
   - bimanual_pick_plate
-  - coordinated_put_item_in_drawer
-  - coordinated_put_bottle_in_fridge
-  - handover_item
+  - bimanual_put_item_in_drawer
+  - bimanual_put_bottle_in_fridge
+  - bimanual_handover_item
   - bimanual_pick_laptop
   - bimanual_straighten_rope
   - bimanual_sweep_to_dustpan
-  - coordinated_lift_tray
-  - handover_item_easy
-  - coordinated_take_tray_out_of_oven
+  - bimanual_lift_tray
+  - bimanual_handover_item_easy
+  - bimanual_take_tray_out_of_oven
 ```
 
 
@@ -124,7 +124,7 @@ rlbench:
 This repository supports multi-GPU training and distributed training across multiple nodes using [PyTorch Distributed Data Parallel (DDP)](https://pytorch.org/docs/stable/notes/ddp.html). 
 Follow the instructions below to configure and run training across multiple GPUs and nodes.
 
-1. Multi-GPU Training on a Single Node
+#### Multi-GPU Training on a Single Node
 
 To train using multiple GPUs on a single node, set the parameter `ddp.num_devices` to the number of GPUs available. For example, if you have 4 GPUs, you can start the training process as follows:
 
@@ -134,7 +134,7 @@ python train.py replay.batch_size=3 method=BIMANUAL_PERACT ddp.num_devices=4
 
 This command will utilize 4 GPUs on the current node for training. Remember to set the `replay.batch_size`, which is per GPU.
 
-2. Multi-Node Training Across Different Nodes
+#### Multi-Node Training Across Different Nodes
 
 If you want to perform distributed training across multiple nodes, you need to set additional parameters: ddp.master_addr and ddp.master_port. These parameters should be configured as follows:
 
